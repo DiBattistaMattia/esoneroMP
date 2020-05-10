@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Bluetooth Demo</string>
+    <string name="btn_transmitter">Transmitter</string>
+    <string name="btn_receiver">Receiver</string>
+    <string name="btn_scan">Scan for devices</string>
+    <string name="btn_send">Send</string>
+    <string name="et_hint_msg">Message...</string>
+    <string name="hint_type_a_message">Type a message...</string>
+    <string name="btn_connect">Connect</string>
+    <string name="not_connected">No device connected</string>
+    <string name="none_found">No new devices found...</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

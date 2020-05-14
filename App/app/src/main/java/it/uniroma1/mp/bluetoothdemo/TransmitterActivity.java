@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -139,9 +140,25 @@ public class TransmitterActivity extends AppCompatActivity {
         lvNewDevices = (ListView) findViewById(R.id.lvNewDevices);
         mBTDevices = new ArrayList<>();
 
-
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        OnItemClickListener listener = new OnItemClickListener() {
+            @Override
+            public void OnClick(String address) {
+
+            }
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                setTitle(parent.getItemAtPosition(position).toString());
+                Intent intent = new Intent(TransmitterActivity.this, SendMessage.class);
+                //intent.putExtra("Address",parent.getItemAtPosition(position).toString());
+                //intent.putExtra("NameDevice",parent.getSelectedItem().getClass().getName());
+                //Log.d("name", parent.getItemAtPosition(position).toString());
+                startActivity(intent);
+            }
+        };
+        lvNewDevices.setOnItemClickListener(listener);
 
         btnONOFF.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,6 +169,7 @@ public class TransmitterActivity extends AppCompatActivity {
         });
 
     }
+
 
 
 

@@ -2,9 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    tools:context=".SendMessage">
+
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/etMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -15,9 +17,16 @@
         android:text="@string/et_hint_msg" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="@string/btn_send" />
+
+    <Button
+        android:id="@+id/btnStartConnection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/btn_connect" />
 </LinearLayout>

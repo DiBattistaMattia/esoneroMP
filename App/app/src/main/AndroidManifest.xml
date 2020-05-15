@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="it.uniroma1.mp.bluetoothdemo">
+    package="it.uniroma2.mp.bluetoothdemo">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -14,22 +14,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ReceiverActivity" />
-        <activity android:name=".SendMessage" />
+        <activity android:name="it.uniroma2.mp.bluetoothdemo.ReceiverActivity" />
+        <activity android:name="it.uniroma2.mp.bluetoothdemo.SendMessage" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name="it.uniroma2.mp.bluetoothdemo.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TransmitterActivity" />
-
-        <service
-            android:name=".BluetoothService"
-            android:enabled="true"
-            android:exported="true"></service>
+        <activity android:name="it.uniroma2.mp.bluetoothdemo.TransmitterActivity" />
     </application>
 
 </manifest>

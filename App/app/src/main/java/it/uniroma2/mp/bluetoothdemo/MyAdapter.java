@@ -1,4 +1,4 @@
-package it.uniroma1.mp.bluetoothdemo;
+package it.uniroma2.mp.bluetoothdemo;
 
 import android.view.LayoutInflater;
 import android.view.View;

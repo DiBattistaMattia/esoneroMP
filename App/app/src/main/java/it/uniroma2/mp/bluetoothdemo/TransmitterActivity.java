@@ -1,4 +1,4 @@
-package it.uniroma1.mp.bluetoothdemo;
+package it.uniroma2.mp.bluetoothdemo;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -107,15 +107,12 @@ public class TransmitterActivity extends AppCompatActivity {
             final String action = intent.getAction();
             Log.d(TAG, "onReceive: ACTION FOUND.");
 
-
-            if (action.equals(BluetoothDevice.ACTION_FOUND)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-                    mBTDevices.add(device);
-                    Log.d(TAG, "onReceive: " + device.getName() + ": " + device.getAddress());
-                    mDeviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, mBTDevices);
-                    lvNewDevices.setAdapter(mDeviceListAdapter);
-
+            if (action.equals(BluetoothDevice.ACTION_FOUND)){
+                BluetoothDevice device = intent.getParcelableExtra (BluetoothDevice.EXTRA_DEVICE);
+                mBTDevices.add(device);
+                Log.d(TAG, "onReceive: " + device.getName() + ": " + device.getAddress());
+                mDeviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, mBTDevices);
+                lvNewDevices.setAdapter(mDeviceListAdapter);
             }
         }
     };
@@ -128,7 +125,7 @@ public class TransmitterActivity extends AppCompatActivity {
         super.onDestroy();
         unregisterReceiver(mBroadcastReceiver1);
         unregisterReceiver(mBroadcastReceiver2);
-        //mBluetoothAdapter.cancelDiscovery();
+        mBluetoothAdapter.cancelDiscovery();
     }
 
     @Override

@@ -20,4 +20,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="on_off">ON/OFF</string>
+    <string name="btn_enable_discoverable">Enable Discoverable</string>
+    <string name="btn_discover">Discover</string>
 </resources>

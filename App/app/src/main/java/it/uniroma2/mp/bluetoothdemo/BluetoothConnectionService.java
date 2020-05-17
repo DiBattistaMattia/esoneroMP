@@ -201,7 +201,7 @@ public class BluetoothConnectionService {
     public void startClient(BluetoothDevice device,UUID uuid){
         Log.d(TAG, "startClient: Started.");
 
-        //initprogress dialog
+        //init progress dialog
         mProgressDialog = ProgressDialog.show(mContext,"Connecting Bluetooth"
                 ,"Please Wait...",true);
 

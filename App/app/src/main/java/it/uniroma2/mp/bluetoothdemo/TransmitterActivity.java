@@ -13,21 +13,28 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.UUID;
 
 
 public class TransmitterActivity extends AppCompatActivity {
     private static final String TAG = "TransmitterActivity";
 
-    BluetoothAdapter mBluetoothAdapter;
-    Button btnEnableDisable_Discoverable;
-    public ArrayList<BluetoothDevice> mBTDevices = new ArrayList<>();
+    private BluetoothAdapter mBluetoothAdapter;
+    public ArrayList<BluetoothDevice> mBTPairedDevices = new ArrayList<>();
+    public ArrayList<BluetoothDevice> mBTDiscoveredDevices = new ArrayList<>();
     public DeviceListAdapter mDeviceListAdapter;
-    ListView lvNewDevices;
+    private BluetoothConnectionService mBluetoothConnection;
+    private static final UUID MY_UUID_INSECURE = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+    private BluetoothDevice mBTDevice;
+
+    Holder holder;
 
 
     // Create a BroadcastReceiver for ACTION_FOUND
@@ -109,10 +116,42 @@ public class TransmitterActivity extends AppCompatActivity {
 
             if (action.equals(BluetoothDevice.ACTION_FOUND)){
                 BluetoothDevice device = intent.getParcelableExtra (BluetoothDevice.EXTRA_DEVICE);
-                mBTDevices.add(device);
-                Log.d(TAG, "onReceive: " + device.getName() + ": " + device.getAddress());
-                mDeviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, mBTDevices);
-                lvNewDevices.setAdapter(mDeviceListAdapter);
+                for(BluetoothDevice dev: mBTDiscoveredDevices){
+                    if(device.getAddress().compareTo(dev.getAddress()) == 0)
+                        return;
+                }
+                mBTDiscoveredDevices.add(device);
+                holder.addDeviceToList(device, false);
+            }
+        }
+    };
+
+    /**
+     * Broadcast Receiver that detects bond state changes (Pairing status changes)
+     */
+    private final BroadcastReceiver mBroadcastReceiver4 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+
+            if(action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)){
+                BluetoothDevice mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                //3 cases:
+                //case1: bonded already
+                if (mDevice.getBondState() == BluetoothDevice.BOND_BONDED){
+                    Log.d(TAG, "BroadcastReceiver: BOND_BONDED.");
+                    //inside BroadcastReceiver4
+                    mBTDevice = mDevice;
+                    holder.activateMessaging();
+                }
+                //case2: creating a bond
+                else if (mDevice.getBondState() == BluetoothDevice.BOND_BONDING) {
+                    Log.d(TAG, "BroadcastReceiver: BOND_BONDING.");
+                }
+                //case3: breaking a bond
+                else if (mDevice.getBondState() == BluetoothDevice.BOND_NONE) {
+                    Log.d(TAG, "BroadcastReceiver: BOND_NONE.");
+                }
             }
         }
     };
@@ -132,39 +171,8 @@ public class TransmitterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transmitter);
-        Button btnONOFF = (Button) findViewById(R.id.btnONOFF);
-        btnEnableDisable_Discoverable = (Button) findViewById(R.id.btnDiscoverable_on_off);
-        lvNewDevices = (ListView) findViewById(R.id.lvNewDevices);
-        mBTDevices = new ArrayList<>();
-
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        OnItemClickListener listener = new OnItemClickListener() {
-            @Override
-            public void OnClick(String address) {
-
-            }
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                setTitle(parent.getItemAtPosition(position).toString());
-                Intent intent = new Intent(TransmitterActivity.this, SendMessage.class);
-                //intent.putExtra("Address",parent.getItemAtPosition(position).toString());
-                //intent.putExtra("NameDevice",parent.getSelectedItem().getClass().getName());
-                //Log.d("name", parent.getItemAtPosition(position).toString());
-                startActivity(intent);
-            }
-        };
-        lvNewDevices.setOnItemClickListener(listener);
-
-        btnONOFF.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "onClick: enabling/disabling bluetooth.");
-                enableDisableBT();
-            }
-        });
-
+        holder = new Holder();
+        retrievePairedDevices();
     }
 
 
@@ -208,26 +216,39 @@ public class TransmitterActivity extends AppCompatActivity {
     public void btnDiscover(View view) {
         Log.d(TAG, "btnDiscover: Looking for unpaired devices.");
 
+        //check BT permissions in manifest
+        checkBTPermissions();
+
         if(mBluetoothAdapter.isDiscovering()){
             mBluetoothAdapter.cancelDiscovery();
             Log.d(TAG, "btnDiscover: Canceling discovery.");
 
-            //check BT permissions in manifest
-            checkBTPermissions();
-
             mBluetoothAdapter.startDiscovery();
             IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
             registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
         }
-        if(!mBluetoothAdapter.isDiscovering()){
-
-            //check BT permissions in manifest
-            checkBTPermissions();
-
+        else {
             mBluetoothAdapter.startDiscovery();
             IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
             registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
         }
+    }
+
+    private void retrievePairedDevices(){
+        Set<BluetoothDevice> set = mBluetoothAdapter.getBondedDevices();
+        mBTPairedDevices.addAll(set);
+        for(BluetoothDevice dev: set){
+            holder.addDeviceToList(dev, true);
+        }
+    }
+
+    private void connectToDevice(BluetoothDevice device){
+        mBluetoothConnection = new BluetoothConnectionService(TransmitterActivity.this);
+        mBluetoothConnection.startClient(device, MY_UUID_INSECURE);
+    }
+
+    private void sendMessage(String message){
+        mBluetoothConnection.write(message.getBytes());
     }
 
     /**
@@ -247,6 +268,92 @@ public class TransmitterActivity extends AppCompatActivity {
             }
         }else{
             Log.d(TAG, "checkBTPermissions: No need to check permissions. SDK version < LOLLIPOP.");
+        }
+    }
+
+    class Holder implements OnItemClickListener, View.OnClickListener {
+        Button btnEnableDisable_Discoverable;
+        Button btnSendMessage;
+        EditText etUserMessage;
+        ListView lvNewDevices;
+        ListView lvPairedDevices;
+
+        public Holder (){
+            Button btnOnOff = findViewById(R.id.btnONOFF);
+            btnEnableDisable_Discoverable = findViewById(R.id.btnDiscoverable_on_off);
+            lvNewDevices = findViewById(R.id.lvNewDevices);
+            lvPairedDevices = findViewById(R.id.lvPairedDevices);
+            btnSendMessage = findViewById(R.id.btnSend);
+            etUserMessage = findViewById(R.id.etMessage);
+
+            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            lvNewDevices.setOnItemClickListener(this);
+            lvPairedDevices.setOnItemClickListener(this);
+
+            btnOnOff.setOnClickListener(this);
+            etUserMessage.setVisibility(View.INVISIBLE);
+            btnSendMessage.setVisibility(View.INVISIBLE);
+
+        }
+
+        public void addDeviceToList(BluetoothDevice device, boolean isPaired){
+            Log.d(TAG, "onReceive: " + device.getName() + ": " + device.getAddress());
+            if(!isPaired) {
+                mDeviceListAdapter = new DeviceListAdapter(getApplicationContext(), R.layout.device_adapter_view, mBTDiscoveredDevices);
+                lvNewDevices.setAdapter(mDeviceListAdapter);
+            }
+            else {
+                mDeviceListAdapter = new DeviceListAdapter(getApplicationContext(), R.layout.device_adapter_view, mBTPairedDevices);
+                lvPairedDevices.setAdapter(mDeviceListAdapter);
+            }
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Log.d(TAG, "onItemClick: click detected");
+            BluetoothDevice device;
+            if(parent.getId() == R.id.lvNewDevices) {
+                Log.d(TAG, "onItemClick: connecting to discovered device");
+                device = mBTDiscoveredDevices.get(position);
+                connectToDevice(device);
+                setTitle(device.getName());
+            }
+            else if(parent.getId() == R.id.lvPairedDevices) {
+                Log.d(TAG, "onItemClick: connecting to paired device");
+                device = mBTPairedDevices.get(position);
+                connectToDevice(device);
+                setTitle(device.getName());
+            }
+        }
+
+        @Override
+        public void OnClick(String deviceAddress) {
+
+        }
+
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.btnONOFF:
+                    Log.d(TAG, "onClick: enabling/disabling bluetooth.");
+                    enableDisableBT();
+                    break;
+                case R.id.btnSend:
+                    if(etUserMessage.getText() != null && !etUserMessage.getText().toString().isEmpty()){
+                        String message = etUserMessage.getText().toString();
+                        Log.d(TAG, "onClick: sending message to the other device");
+                        sendMessage(message);
+                    }
+                    break;
+            }
+
+        }
+
+        public void activateMessaging() {
+            etUserMessage.setVisibility(View.VISIBLE);
+            btnSendMessage.setVisibility(View.VISIBLE);
+            lvPairedDevices.setVisibility(View.GONE);
+            lvNewDevices.setVisibility(View.GONE);
         }
     }
 }

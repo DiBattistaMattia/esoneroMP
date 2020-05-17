@@ -16,7 +16,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import it.thecommits.bluetoothdemo_6.R;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -94,6 +96,10 @@ public class TransmitterActivity extends AppCompatActivity {
                         break;
                     case BluetoothAdapter.STATE_CONNECTED:
                         Log.d(TAG, "mBroadcastReceiver2: Connected.");
+                        //inside BroadcastReceiver4
+                        BluetoothDevice mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                        mBTDevice = mDevice;
+                        holder.activateMessaging();
                         break;
                 }
 
@@ -109,6 +115,7 @@ public class TransmitterActivity extends AppCompatActivity {
      * -Executed by btnDiscover() method.
      */
     private BroadcastReceiver mBroadcastReceiver3 = new BroadcastReceiver() {
+        @RequiresApi(api = Build.VERSION_CODES.ECLAIR)
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
@@ -140,9 +147,6 @@ public class TransmitterActivity extends AppCompatActivity {
                 //case1: bonded already
                 if (mDevice.getBondState() == BluetoothDevice.BOND_BONDED){
                     Log.d(TAG, "BroadcastReceiver: BOND_BONDED.");
-                    //inside BroadcastReceiver4
-                    mBTDevice = mDevice;
-                    holder.activateMessaging();
                 }
                 //case2: creating a bond
                 else if (mDevice.getBondState() == BluetoothDevice.BOND_BONDING) {

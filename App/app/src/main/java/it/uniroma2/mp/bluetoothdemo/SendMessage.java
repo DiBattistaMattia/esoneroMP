@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
+import it.thecommits.bluetoothdemo_6.R;
 
 import java.nio.charset.Charset;
 import java.util.UUID;

@@ -5,16 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    android:backgroundTint="@color/background"
+    android:backgroundTint="@color/colorPrimary"
     tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/tvPresentation"
-        android:layout_width="241dp"
-        android:layout_height="175dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="44dp"
+        android:layout_marginEnd="20dp"
         android:text="@string/presentation_msg"
         android:textAlignment="center"
+        android:textColor="@android:color/background_light"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
@@ -22,29 +25,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnReceiver"
+        android:id="@+id/btnContinue"
         android:layout_width="178dp"
         android:layout_height="42dp"
         android:layout_marginStart="116dp"
-        android:layout_marginTop="99dp"
-        android:layout_marginEnd="117dp"
-        android:text="@string/btn_receiver"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPresentation" />
-
-    <Button
-        android:id="@+id/btnTransmitter"
-        android:layout_width="178dp"
-        android:layout_height="42dp"
-        android:layout_marginStart="116dp"
-        android:layout_marginTop="56dp"
         android:layout_marginEnd="117dp"
         android:layout_marginBottom="274dp"
+        android:backgroundTint="@android:color/tertiary_text_light"
         android:text="@string/btn_transmitter"
+        android:textColor="@android:color/background_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnReceiver" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

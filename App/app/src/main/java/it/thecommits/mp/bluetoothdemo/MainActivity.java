@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -17,28 +18,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     class Holder implements View.OnClickListener {
-        Button btnTransmitter;
-        Button btnReceiver;
-
+        Button btnContinue;
 
         Holder() {
-            btnReceiver = findViewById(R.id.btnReceiver);
-            btnTransmitter = findViewById(R.id.btnTransmitter);
-
-            btnTransmitter.setOnClickListener(this);
-            btnReceiver.setOnClickListener(this);
+            btnContinue = findViewById(R.id.btnContinue);
+            btnContinue.setOnClickListener(this);
         }
+
 
         @Override
         public void onClick(View view) {
-            if(view.getId() == R.id.btnTransmitter){
-                Intent intent = new Intent(MainActivity.this, TransmitterActivity.class);
-                startActivity(intent);
-            }
-            else if(view.getId() == R.id.btnReceiver){
-                Intent intent = new Intent(MainActivity.this, ReceiverActivity.class);
-                startActivity(intent);
-            }
+
+            Intent intent = new Intent(MainActivity.this, TransmitterActivity.class);
+            startActivity(intent);
+
         }
     }
 }

@@ -35,16 +35,15 @@ public class TransmitterActivity extends AppCompatActivity {
     public DeviceListAdapter mDeviceListAdapter;
     private BluetoothConnectionService mBluetoothConnection;
     private static final UUID MY_UUID_INSECURE = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
-    private BluetoothDevice mBTDevice;
-
+    public BluetoothDevice mBTDevice;
     private Holder holder;
-
 
     // Create a BroadcastReceiver for ACTION_FOUND
     private final BroadcastReceiver mBroadcastReceiver1 = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             // When discovery finds a device
+            assert action != null;
             if (action.equals(mBluetoothAdapter.ACTION_STATE_CHANGED)) {
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, mBluetoothAdapter.ERROR);
 
@@ -181,6 +180,7 @@ public class TransmitterActivity extends AppCompatActivity {
         holder = new Holder();
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         retrievePairedDevices();
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("incomingMessage"));
     }
 
@@ -188,7 +188,7 @@ public class TransmitterActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String text = intent.getStringExtra("theMessage");
-            Log.d(INPUT_SERVICE,intent.getStringExtra("theMessage") );
+            Log.d(INPUT_SERVICE,intent.getStringExtra("theMessage"));
             holder.showMessage(text);
         }
     };
@@ -297,15 +297,26 @@ public class TransmitterActivity extends AppCompatActivity {
         ListView lvNewDevices;
         ListView lvPairedDevices;
         TextView tvReceivedMessage;
+        TextView tvMessageSend;
+        BluetoothDevice device;
+        TextView tvListDevicesPaired;
+        TextView tvListDevicesNotYetPaired;
+        Button btnOnOff;
+        TextView tvMessageReceived;
 
         public Holder (){
-            Button btnOnOff = findViewById(R.id.btnONOFF);
+            btnOnOff = findViewById(R.id.btnONOFF);
             btnSendMessage = findViewById(R.id.btnSend);
             btnDiscoverUnpairedDevices = findViewById(R.id.btnFindUnpairedDevices);
             btnEnableDisableDiscoverable = findViewById(R.id.btnDiscoverable_on_off);
 
             etUserMessage = findViewById(R.id.etMessage);
             tvReceivedMessage = findViewById(R.id.tvReceivedMessage);
+            tvMessageSend = findViewById(R.id.tvMessageSend);
+            tvListDevicesPaired = findViewById(R.id.tvListDevicesPaired);
+            tvListDevicesNotYetPaired = findViewById(R.id.tvListDevicesNotYetPaired);
+            tvMessageReceived = findViewById(R.id.tvMessageReceived);
+
 
             lvNewDevices = findViewById(R.id.lvNewDevices);
             lvPairedDevices = findViewById(R.id.lvPairedDevices);
@@ -320,6 +331,9 @@ public class TransmitterActivity extends AppCompatActivity {
 
             etUserMessage.setVisibility(View.INVISIBLE);
             btnSendMessage.setVisibility(View.INVISIBLE);
+            tvMessageSend.setVisibility(View.INVISIBLE);
+            tvMessageReceived.setVisibility(View.INVISIBLE);
+            tvReceivedMessage.setVisibility(View.INVISIBLE);
 
         }
 
@@ -338,12 +352,10 @@ public class TransmitterActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Log.d(TAG, "onItemClick: click detected");
-            BluetoothDevice device;
             if(parent.getId() == R.id.lvNewDevices) {
                 Log.d(TAG, "onItemClick: connecting to discovered device");
                 device = mBTDiscoveredDevices.get(position);
                 connectToDevice(device);
-                setTitle(device.getName());
                 activateMessaging();
 
             }
@@ -351,7 +363,6 @@ public class TransmitterActivity extends AppCompatActivity {
                 Log.d(TAG, "onItemClick: connecting to paired device");
                 device = mBTPairedDevices.get(position);
                 connectToDevice(device);
-                setTitle(device.getName());
                 activateMessaging();
 
             }
@@ -391,11 +402,29 @@ public class TransmitterActivity extends AppCompatActivity {
             btnSendMessage.setVisibility(View.VISIBLE);
             lvPairedDevices.setVisibility(View.GONE);
             lvNewDevices.setVisibility(View.GONE);
+            tvListDevicesNotYetPaired.setVisibility(View.GONE);
+            tvListDevicesPaired.setVisibility(View.GONE);
+            tvMessageSend.setVisibility(View.VISIBLE);
+            btnDiscoverUnpairedDevices.setVisibility(View.INVISIBLE);
+            btnEnableDisableDiscoverable.setVisibility(View.INVISIBLE);
+            btnOnOff.setVisibility(View.INVISIBLE);
+
+            tvMessageSend.setText("Send something to " + device.getName());
+
         }
 
         public void showMessage(String text) {
-            Toast.makeText(TransmitterActivity.this, R.string.toast_incoming_message, Toast.LENGTH_SHORT);
+            //Toast.makeText(TransmitterActivity.this, R.string.toast_incoming_message, Toast.LENGTH_SHORT);
+            tvReceivedMessage.setVisibility(View.VISIBLE);
+            tvMessageReceived.setVisibility(View.VISIBLE);
+            btnDiscoverUnpairedDevices.setVisibility(View.INVISIBLE);
+            btnEnableDisableDiscoverable.setVisibility(View.INVISIBLE);
+
+
+
+
             tvReceivedMessage.setText(text);
+
         }
     }
 }

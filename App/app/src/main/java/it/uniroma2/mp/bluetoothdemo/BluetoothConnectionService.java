@@ -225,7 +225,7 @@ public class BluetoothConnectionService {
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
-            //dismiss the progressdialog when connection is established
+            //dismiss the progress dialog when connection is established
             try{
                 mProgressDialog.dismiss();
             }catch (NullPointerException e){
@@ -257,6 +257,7 @@ public class BluetoothConnectionService {
                     String incomingMessage = new String(buffer, 0, bytes);
                     Log.d(TAG, "InputStream: " + incomingMessage);
                 } catch (IOException e) {
+
                     Log.e(TAG, "write: Error reading Input Stream. " + e.getMessage() );
                     break;
                 }

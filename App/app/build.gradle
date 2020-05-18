@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "it.thecommits.bluetoothdemo_6"
+        applicationId "it.uniroma2.mp.bluetoothdemo"
         minSdkVersion 23
         targetSdkVersion 29
         versionCode 1

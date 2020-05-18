@@ -15,10 +15,11 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import it.thecommits.bluetoothdemo_6.R;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -36,7 +37,7 @@ public class TransmitterActivity extends AppCompatActivity {
     private static final UUID MY_UUID_INSECURE = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
     private BluetoothDevice mBTDevice;
 
-    Holder holder;
+    private Holder holder;
 
 
     // Create a BroadcastReceiver for ACTION_FOUND
@@ -78,6 +79,7 @@ public class TransmitterActivity extends AppCompatActivity {
             if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
 
                 int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
+                BluetoothDevice mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
                 switch (mode) {
                     //Device is in Discoverable Mode
@@ -96,8 +98,6 @@ public class TransmitterActivity extends AppCompatActivity {
                         break;
                     case BluetoothAdapter.STATE_CONNECTED:
                         Log.d(TAG, "mBroadcastReceiver2: Connected.");
-                        //inside BroadcastReceiver4
-                        BluetoothDevice mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                         mBTDevice = mDevice;
                         holder.activateMessaging();
                         break;
@@ -115,7 +115,6 @@ public class TransmitterActivity extends AppCompatActivity {
      * -Executed by btnDiscover() method.
      */
     private BroadcastReceiver mBroadcastReceiver3 = new BroadcastReceiver() {
-        @RequiresApi(api = Build.VERSION_CODES.ECLAIR)
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
@@ -166,8 +165,12 @@ public class TransmitterActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.d(TAG, "onDestroy: called.");
         super.onDestroy();
-        unregisterReceiver(mBroadcastReceiver1);
-        unregisterReceiver(mBroadcastReceiver2);
+        try {
+            unregisterReceiver(mBroadcastReceiver1);
+            unregisterReceiver(mBroadcastReceiver2);
+        } catch (Exception e){
+            // if not registered, ignore
+        }
         mBluetoothAdapter.cancelDiscovery();
     }
 
@@ -177,7 +180,17 @@ public class TransmitterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_transmitter);
         holder = new Holder();
         retrievePairedDevices();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("incomingMessage"));
     }
+
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String text = intent.getStringExtra("theMessage");
+            Log.d(INPUT_SERVICE,intent.getStringExtra("theMessage") );
+            holder.showMessage(text);
+        }
+    };
 
 
 
@@ -205,7 +218,7 @@ public class TransmitterActivity extends AppCompatActivity {
     }
 
 
-    public void btnEnableDisable_Discoverable(View view) {
+    public void btnEnableDisableDiscoverable() {
         Log.d(TAG, "btnEnableDisable_Discoverable: Making device discoverable for 300 seconds.");
 
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
@@ -217,7 +230,7 @@ public class TransmitterActivity extends AppCompatActivity {
 
     }
 
-    public void btnDiscover(View view) {
+    public void discoverDevices() {
         Log.d(TAG, "btnDiscover: Looking for unpaired devices.");
 
         //check BT permissions in manifest
@@ -275,26 +288,35 @@ public class TransmitterActivity extends AppCompatActivity {
         }
     }
 
-    class Holder implements OnItemClickListener, View.OnClickListener {
-        Button btnEnableDisable_Discoverable;
+    class Holder implements AdapterView.OnItemClickListener, View.OnClickListener {
         Button btnSendMessage;
+        Button btnDiscoverUnpairedDevices;
+        Button btnEnableDisableDiscoverable;
         EditText etUserMessage;
         ListView lvNewDevices;
         ListView lvPairedDevices;
+        TextView tvReceivedMessage;
 
         public Holder (){
             Button btnOnOff = findViewById(R.id.btnONOFF);
-            btnEnableDisable_Discoverable = findViewById(R.id.btnDiscoverable_on_off);
+            btnSendMessage = findViewById(R.id.btnSend);
+            btnDiscoverUnpairedDevices = findViewById(R.id.btnFindUnpairedDevices);
+            btnEnableDisableDiscoverable = findViewById(R.id.btnDiscoverable_on_off);
+
+            etUserMessage = findViewById(R.id.etMessage);
+            tvReceivedMessage = findViewById(R.id.tvReceivedMessage);
+
             lvNewDevices = findViewById(R.id.lvNewDevices);
             lvPairedDevices = findViewById(R.id.lvPairedDevices);
-            btnSendMessage = findViewById(R.id.btnSend);
-            etUserMessage = findViewById(R.id.etMessage);
 
-            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             lvNewDevices.setOnItemClickListener(this);
             lvPairedDevices.setOnItemClickListener(this);
 
             btnOnOff.setOnClickListener(this);
+            btnSendMessage.setOnClickListener(this);
+            btnDiscoverUnpairedDevices.setOnClickListener(this);
+            btnEnableDisableDiscoverable.setOnClickListener(this);
+
             etUserMessage.setVisibility(View.INVISIBLE);
             btnSendMessage.setVisibility(View.INVISIBLE);
 
@@ -321,22 +343,22 @@ public class TransmitterActivity extends AppCompatActivity {
                 device = mBTDiscoveredDevices.get(position);
                 connectToDevice(device);
                 setTitle(device.getName());
+                activateMessaging();
+
             }
             else if(parent.getId() == R.id.lvPairedDevices) {
                 Log.d(TAG, "onItemClick: connecting to paired device");
                 device = mBTPairedDevices.get(position);
                 connectToDevice(device);
                 setTitle(device.getName());
+                activateMessaging();
+
             }
         }
 
         @Override
-        public void OnClick(String deviceAddress) {
-
-        }
-
-        @Override
         public void onClick(View view) {
+            Log.d(TAG, "onClick: clicked button " + view.toString());
             switch (view.getId()) {
                 case R.id.btnONOFF:
                     Log.d(TAG, "onClick: enabling/disabling bluetooth.");
@@ -347,7 +369,17 @@ public class TransmitterActivity extends AppCompatActivity {
                         String message = etUserMessage.getText().toString();
                         Log.d(TAG, "onClick: sending message to the other device");
                         sendMessage(message);
+                    }else{
+                        Toast toast = null;
+                        toast.makeText(getApplicationContext(), "Write a message first...",
+                                Toast.LENGTH_LONG).show();
                     }
+                    break;
+                case R.id.btnFindUnpairedDevices:
+                    discoverDevices();
+                    break;
+                case R.id.btnDiscoverable_on_off:
+                    btnEnableDisableDiscoverable();
                     break;
             }
 
@@ -358,6 +390,11 @@ public class TransmitterActivity extends AppCompatActivity {
             btnSendMessage.setVisibility(View.VISIBLE);
             lvPairedDevices.setVisibility(View.GONE);
             lvNewDevices.setVisibility(View.GONE);
+        }
+
+        public void showMessage(String text) {
+            Toast.makeText(TransmitterActivity.this, R.string.toast_incoming_message, Toast.LENGTH_SHORT);
+            tvReceivedMessage.setText(text);
         }
     }
 }

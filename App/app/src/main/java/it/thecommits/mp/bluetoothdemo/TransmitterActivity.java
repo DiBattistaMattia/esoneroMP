@@ -179,6 +179,7 @@ public class TransmitterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transmitter);
         holder = new Holder();
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         retrievePairedDevices();
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("incomingMessage"));
     }

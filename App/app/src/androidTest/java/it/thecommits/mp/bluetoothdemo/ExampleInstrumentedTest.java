@@ -1,4 +1,4 @@
-package it.uniroma2.mp.bluetoothdemo;
+package it.thecommits.mp.bluetoothdemo;
 
 import android.content.Context;
 

@@ -17,11 +17,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
-/**
- * Created by User on 12/21/2016.
- */
-
-public class BluetoothConnectionService {
+class BluetoothConnectionService {
     private static final String TAG = "BluetoothConnectionServ";
 
     private static final String appName = "MYAPP";
@@ -37,11 +33,11 @@ public class BluetoothConnectionService {
     private ConnectThread mConnectThread;
     private BluetoothDevice mmDevice;
     private UUID deviceUUID;
-    ProgressDialog mProgressDialog;
+    private ProgressDialog mProgressDialog;
 
     private ConnectedThread mConnectedThread;
 
-    public BluetoothConnectionService(Context context) {
+    BluetoothConnectionService(Context context) {
         mContext = context;
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         start();
@@ -58,7 +54,7 @@ public class BluetoothConnectionService {
         // The local server socket
         private final BluetoothServerSocket mmServerSocket;
 
-        public AcceptThread(){
+        AcceptThread(){
             BluetoothServerSocket tmp = null;
 
             // Create a new listening server socket
@@ -93,19 +89,10 @@ public class BluetoothConnectionService {
 
             //talk about this is in the 3rd
             if(socket != null){
-                connected(socket,mmDevice);
+                connected(socket);
             }
 
             Log.i(TAG, "END mAcceptThread ");
-        }
-
-        public void cancel() {
-            Log.d(TAG, "cancel: Canceling AcceptThread.");
-            try {
-                mmServerSocket.close();
-            } catch (IOException e) {
-                Log.e(TAG, "cancel: Close of AcceptThread ServerSocket failed. " + e.getMessage() );
-            }
         }
 
     }
@@ -118,7 +105,7 @@ public class BluetoothConnectionService {
     private class ConnectThread extends Thread {
         private BluetoothSocket mmSocket;
 
-        public ConnectThread(BluetoothDevice device, UUID uuid) {
+        ConnectThread(BluetoothDevice device, UUID uuid) {
             Log.d(TAG, "ConnectThread: started.");
             mmDevice = device;
             deviceUUID = uuid;
@@ -163,9 +150,9 @@ public class BluetoothConnectionService {
             }
 
             //will talk about this in the 3rd video
-            connected(mmSocket,mmDevice);
+            connected(mmSocket);
         }
-        public void cancel() {
+        void cancel() {
             try {
                 Log.d(TAG, "cancel: Closing Client Socket.");
                 mmSocket.close();
@@ -181,7 +168,7 @@ public class BluetoothConnectionService {
      * Start the chat service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume()
      */
-    public synchronized void start() {
+    private synchronized void start() {
         Log.d(TAG, "start");
 
         // Cancel any thread attempting to make a connection
@@ -201,14 +188,14 @@ public class BluetoothConnectionService {
      Then ConnectThread starts and attempts to make a connection with the other devices AcceptThread.
      **/
 
-    public void startClient(BluetoothDevice device,UUID uuid){
+    void startClient(BluetoothDevice device, UUID myUuidInsecure){
         Log.d(TAG, "startClient: Started.");
 
         //init progress dialog
         mProgressDialog = ProgressDialog.show(mContext,"Connecting Bluetooth"
                 ,"Please Wait...",true);
 
-        mConnectThread = new ConnectThread(device, uuid);
+        mConnectThread = new ConnectThread(device, MY_UUID_INSECURE);
         mConnectThread.start();
     }
 
@@ -217,14 +204,12 @@ public class BluetoothConnectionService {
      receiving incoming data through input/output streams respectively.
      **/
     private class ConnectedThread extends Thread {
-        private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
-        public ConnectedThread(BluetoothSocket socket) {
+        ConnectedThread(BluetoothSocket socket) {
             Log.d(TAG, "ConnectedThread: Starting.");
 
-            mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
@@ -237,8 +222,8 @@ public class BluetoothConnectionService {
 
 
             try {
-                tmpIn = mmSocket.getInputStream();
-                tmpOut = mmSocket.getOutputStream();
+                tmpIn = socket.getInputStream();
+                tmpOut = socket.getOutputStream();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -273,7 +258,7 @@ public class BluetoothConnectionService {
         }
 
         //Call this from the main activity to send data to the remote device
-        public void write(byte[] bytes) {
+        void write(byte[] bytes) {
             String text = new String(bytes, Charset.defaultCharset());
             Log.d(TAG, "write: Writing to outputstream: " + text);
             try {
@@ -283,15 +268,9 @@ public class BluetoothConnectionService {
             }
         }
 
-        /* Call this from the main activity to shutdown the connection */
-        public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) { }
-        }
     }
 
-    private void connected(BluetoothSocket mmSocket, BluetoothDevice mmDevice) {
+    private void connected(BluetoothSocket mmSocket) {
         Log.d(TAG, "connected: Starting.");
 
         // Start the thread to manage the connection and perform transmissions
@@ -305,9 +284,7 @@ public class BluetoothConnectionService {
      * @param out The bytes to write
      * @see ConnectedThread#write(byte[])
      */
-    public void write(byte[] out) {
-        // Create temporary object
-        ConnectedThread r;
+    void write(byte[] out) {
 
         // Synchronize a copy of the ConnectedThread
         Log.d(TAG, "write: Write Called.");

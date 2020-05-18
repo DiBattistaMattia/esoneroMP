@@ -4,11 +4,11 @@
     <string name="btn_receiver">Receive</string>
     <string name="btn_scan">Start/stop scan</string>
     <string name="btn_send">Send</string>
-    <string name="et_hint_msg">Message...</string>
-    <string name="hint_type_a_message">Type a message...</string>
+    <string name="et_hint_msg">Message…</string>
+    <string name="hint_type_a_message">Type a message…</string>
     <string name="btn_connect">Connect</string>
     <string name="not_connected">No device connected</string>
-    <string name="none_found">No new devices found...</string>
+    <string name="none_found">No new devices found…</string>
     <string name="presentation_msg">Hi! this is a Bluetooth Demo, the purpose is to provide
         two types of functions, transmit a message from one device to
         other and receive the same. Please click on the button below to continue!</string>
@@ -26,4 +26,5 @@
     <string name="btn_enable_discoverable">Enable Discoverable</string>
     <string name="btn_discover">Discover</string>
     <string name="toast_incoming_message">New message incoming</string>
+    <string name="sendPresentation">\Send something to \</string>
 </resources>

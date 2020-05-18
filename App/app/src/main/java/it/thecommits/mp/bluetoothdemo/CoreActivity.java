@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,11 +21,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 
-public class TransmitterActivity extends AppCompatActivity {
+public class CoreActivity extends AppCompatActivity {
     private static final String TAG = "TransmitterActivity";
 
     private BluetoothAdapter mBluetoothAdapter;
@@ -44,8 +44,8 @@ public class TransmitterActivity extends AppCompatActivity {
             String action = intent.getAction();
             // When discovery finds a device
             assert action != null;
-            if (action.equals(mBluetoothAdapter.ACTION_STATE_CHANGED)) {
-                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, mBluetoothAdapter.ERROR);
+            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
 
                 switch(state){
                     case BluetoothAdapter.STATE_OFF:
@@ -75,6 +75,7 @@ public class TransmitterActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
 
+            assert action != null;
             if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
 
                 int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
@@ -119,45 +120,20 @@ public class TransmitterActivity extends AppCompatActivity {
             final String action = intent.getAction();
             Log.d(TAG, "onReceive: ACTION FOUND.");
 
+            assert action != null;
             if (action.equals(BluetoothDevice.ACTION_FOUND)){
                 BluetoothDevice device = intent.getParcelableExtra (BluetoothDevice.EXTRA_DEVICE);
                 for(BluetoothDevice dev: mBTDiscoveredDevices){
+                    assert device != null;
                     if(device.getAddress().compareTo(dev.getAddress()) == 0)
                         return;
                 }
                 mBTDiscoveredDevices.add(device);
+                assert device != null;
                 holder.addDeviceToList(device, false);
             }
         }
     };
-
-    /**
-     * Broadcast Receiver that detects bond state changes (Pairing status changes)
-     */
-    private final BroadcastReceiver mBroadcastReceiver4 = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-
-            if(action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)){
-                BluetoothDevice mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                //3 cases:
-                //case1: bonded already
-                if (mDevice.getBondState() == BluetoothDevice.BOND_BONDED){
-                    Log.d(TAG, "BroadcastReceiver: BOND_BONDED.");
-                }
-                //case2: creating a bond
-                else if (mDevice.getBondState() == BluetoothDevice.BOND_BONDING) {
-                    Log.d(TAG, "BroadcastReceiver: BOND_BONDING.");
-                }
-                //case3: breaking a bond
-                else if (mDevice.getBondState() == BluetoothDevice.BOND_NONE) {
-                    Log.d(TAG, "BroadcastReceiver: BOND_NONE.");
-                }
-            }
-        }
-    };
-
 
 
     @Override
@@ -188,7 +164,7 @@ public class TransmitterActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String text = intent.getStringExtra("theMessage");
-            Log.d(INPUT_SERVICE,intent.getStringExtra("theMessage"));
+            Log.d(INPUT_SERVICE, Objects.requireNonNull(intent.getStringExtra("theMessage")));
             holder.showMessage(text);
         }
     };
@@ -226,7 +202,7 @@ public class TransmitterActivity extends AppCompatActivity {
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         startActivity(discoverableIntent);
 
-        IntentFilter intentFilter = new IntentFilter(mBluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        IntentFilter intentFilter = new IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
         registerReceiver(mBroadcastReceiver2,intentFilter);
 
     }
@@ -261,7 +237,7 @@ public class TransmitterActivity extends AppCompatActivity {
     }
 
     private void connectToDevice(BluetoothDevice device){
-        mBluetoothConnection = new BluetoothConnectionService(TransmitterActivity.this);
+        mBluetoothConnection = new BluetoothConnectionService(CoreActivity.this);
         mBluetoothConnection.startClient(device, MY_UUID_INSECURE);
     }
 
@@ -277,15 +253,11 @@ public class TransmitterActivity extends AppCompatActivity {
      * NOTE: This will only execute on versions > LOLLIPOP because it is not needed otherwise.
      */
     private void checkBTPermissions() {
-        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
-            int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
-            permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
-            if (permissionCheck != 0) {
+        int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
+        permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
+        if (permissionCheck != 0) {
 
-                this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1001); //Any number
-            }
-        }else{
-            Log.d(TAG, "checkBTPermissions: No need to check permissions. SDK version < LOLLIPOP.");
+            this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1001); //Any number
         }
     }
 
@@ -304,7 +276,7 @@ public class TransmitterActivity extends AppCompatActivity {
         Button btnOnOff;
         TextView tvMessageReceived;
 
-        public Holder (){
+        private Holder (){
             btnOnOff = findViewById(R.id.btnONOFF);
             btnSendMessage = findViewById(R.id.btnSend);
             btnDiscoverUnpairedDevices = findViewById(R.id.btnFindUnpairedDevices);
@@ -337,7 +309,7 @@ public class TransmitterActivity extends AppCompatActivity {
 
         }
 
-        public void addDeviceToList(BluetoothDevice device, boolean isPaired){
+        private void addDeviceToList(BluetoothDevice device, boolean isPaired){
             Log.d(TAG, "onReceive: " + device.getName() + ": " + device.getAddress());
             if(!isPaired) {
                 mDeviceListAdapter = new DeviceListAdapter(getApplicationContext(), R.layout.device_adapter_view, mBTDiscoveredDevices);
@@ -382,8 +354,7 @@ public class TransmitterActivity extends AppCompatActivity {
                         Log.d(TAG, "onClick: sending message to the other device");
                         sendMessage(message);
                     }else{
-                        Toast toast = null;
-                        toast.makeText(getApplicationContext(), "Write a message first...",
+                        Toast.makeText(getApplicationContext(), "Write a message first...",
                                 Toast.LENGTH_LONG).show();
                     }
                     break;
@@ -397,7 +368,8 @@ public class TransmitterActivity extends AppCompatActivity {
 
         }
 
-        public void activateMessaging() {
+        private void activateMessaging() {
+
             etUserMessage.setVisibility(View.VISIBLE);
             btnSendMessage.setVisibility(View.VISIBLE);
             lvPairedDevices.setVisibility(View.GONE);
@@ -409,20 +381,16 @@ public class TransmitterActivity extends AppCompatActivity {
             btnEnableDisableDiscoverable.setVisibility(View.INVISIBLE);
             btnOnOff.setVisibility(View.INVISIBLE);
 
-            tvMessageSend.setText("Send something to " + device.getName());
+            tvMessageSend.setText(String.format("%s%s", getString(R.string.sendPresentation), device.getName()));
 
         }
 
-        public void showMessage(String text) {
-            //Toast.makeText(TransmitterActivity.this, R.string.toast_incoming_message, Toast.LENGTH_SHORT);
+        private void showMessage(String text) {
+
             tvReceivedMessage.setVisibility(View.VISIBLE);
             tvMessageReceived.setVisibility(View.VISIBLE);
             btnDiscoverUnpairedDevices.setVisibility(View.INVISIBLE);
             btnEnableDisableDiscoverable.setVisibility(View.INVISIBLE);
-
-
-
-
             tvReceivedMessage.setText(text);
 
         }

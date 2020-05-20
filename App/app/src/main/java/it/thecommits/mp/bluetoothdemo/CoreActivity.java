@@ -44,8 +44,7 @@ public class CoreActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             // When discovery finds a device
-            assert action != null;
-            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+            if (action != null && action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
 
                 switch(state){
@@ -76,8 +75,7 @@ public class CoreActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
 
-            assert action != null;
-            if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
+            if (action != null && action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
 
                 int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
                 BluetoothDevice mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -87,7 +85,7 @@ public class CoreActivity extends AppCompatActivity {
                     case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
                         Log.d(TAG, "mBroadcastReceiver2: Discoverability Enabled.");
                         break;
-                    //Device not in discoverable mode
+                    // Device not in discoverable mode
                     case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
                         Log.d(TAG, "mBroadcastReceiver2: Discoverability Disabled. Able to receive connections.");
                         break;
@@ -119,8 +117,7 @@ public class CoreActivity extends AppCompatActivity {
             final String action = intent.getAction();
             Log.d(TAG, "onReceive: ACTION FOUND.");
 
-            assert action != null;
-            if (action.equals(BluetoothDevice.ACTION_FOUND)){
+            if (action != null && action.equals(BluetoothDevice.ACTION_FOUND)){
                 BluetoothDevice device = intent.getParcelableExtra (BluetoothDevice.EXTRA_DEVICE);
                 for(BluetoothDevice dev: mBTDiscoveredDevices){
                     if(device == null || device.getAddress().compareTo(dev.getAddress()) == 0)
@@ -140,22 +137,21 @@ public class CoreActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
 
-            assert action != null;
-            if(action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)){
+            if(action != null && action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)){
                 BluetoothDevice mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                //3 cases:
-                //case1: bonded already
+                // 3 cases:
+                // case 1: bonded already
                 assert mDevice != null;
                 if (mDevice.getBondState() == BluetoothDevice.BOND_BONDED){
                     Log.d(TAG, "BroadcastReceiver: BOND_BONDED.");
-                    //inside BroadcastReceiver4
+                    // inside BroadcastReceiver4
                     mBTDevice = mDevice;
                 }
-                //case2: creating a bone
+                // case 2: creating a bone
                 if (mDevice.getBondState() == BluetoothDevice.BOND_BONDING) {
                     Log.d(TAG, "BroadcastReceiver: BOND_BONDING.");
                 }
-                //case3: breaking a bond
+                // case 3: breaking a bond
                 if (mDevice.getBondState() == BluetoothDevice.BOND_NONE) {
                     Log.d(TAG, "BroadcastReceiver: BOND_NONE.");
                 }
@@ -394,7 +390,7 @@ public class CoreActivity extends AppCompatActivity {
                         Log.d(TAG, "onClick: sending message to the other device");
                         sendMessage(message);
                     }else{
-                        Toast.makeText(getApplicationContext(), "Write a message first...",
+                        Toast.makeText(getApplicationContext(), R.string.txt_write_a_message,
                                 Toast.LENGTH_LONG).show();
                     }
                     break;

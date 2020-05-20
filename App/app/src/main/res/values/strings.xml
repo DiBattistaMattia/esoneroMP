@@ -18,4 +18,5 @@ other and receive the same. Click on the button below to continue!</string>
     <string name="you_have_received_a_new_message">You have received a new message</string>
     <string name="txt_enable_gps">Please enable your GPS</string>
     <string name="txt_please_wait">Please Wait...</string>
+    <string name="txt_write_a_message">Write a message first...</string>
 </resources>

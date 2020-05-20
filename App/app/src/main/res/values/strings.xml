@@ -9,10 +9,9 @@
     <string name="btn_connect">Connect</string>
     <string name="not_connected">No device connected</string>
     <string name="none_found">No new devices found…</string>
-    <string name="presentation_msg">Hi! this is a Bluetooth Demo, the purpose is to provide
-        two types of functions, transmit a message from one device to
-        other and receive the same. Please click on the button below to continue!</string>
-
+    <string name="presentation_msg">Hi! this is a Bluetooth demo, the aim is to provide
+two types of functions, transmit a message from one device to a
+other and receive the same. Click on the button below to continue!</string>
 
     <string name="app_name2">BT</string>
     <string name="hello">Bluetooth Demo</string>
@@ -20,11 +19,13 @@
     <string name="none_paired">No devices paired, see manual</string>
     <string name="discover">Discover Devices</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="on_off">ON/OFF</string>
     <string name="btn_enable_discoverable">Enable Discoverable</string>
     <string name="btn_discover">Discover</string>
     <string name="toast_incoming_message">New message incoming</string>
     <string name="sendPresentation">\Send something to \</string>
+    <string name="devices_yet_paired">Devices yet paired</string>
+    <string name="devices_not_yet_paired">Devices not yet paired</string>
+    <string name="you_have_received_a_new_message">You have received a new message</string>
 </resources>

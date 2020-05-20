@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 Nome del Gruppo: the commits
 Elenco di tutti i membri del gruppo:
 Mattia Di Battista, 0239836
 // (Nome, Cognome e matricola)
+=======
+Nome del Gruppo: the commits
+Elenco di tutti i membri del gruppo:
+Mattia Di Battista, 0239836
+// (Nome, Cognome e matricola)
+>>>>>>> 7199714ad206263b9896a2419bd97070d0455801
 Esonero selezionato: Bluetooth

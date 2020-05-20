@@ -123,12 +123,10 @@ public class CoreActivity extends AppCompatActivity {
             if (action.equals(BluetoothDevice.ACTION_FOUND)){
                 BluetoothDevice device = intent.getParcelableExtra (BluetoothDevice.EXTRA_DEVICE);
                 for(BluetoothDevice dev: mBTDiscoveredDevices){
-                    assert device != null;
-                    if(device.getAddress().compareTo(dev.getAddress()) == 0)
+                    if(device == null || device.getAddress().compareTo(dev.getAddress()) == 0)
                         return;
                 }
                 mBTDiscoveredDevices.add(device);
-                assert device != null;
                 holder.addDeviceToList(device, false);
             }
         }
@@ -205,6 +203,7 @@ public class CoreActivity extends AppCompatActivity {
     public void enableDisableBT(){
         if(mBluetoothAdapter == null){
             Log.d(TAG, "enableDisableBT: Does not have BT capabilities.");
+            return;
         }
 
         if(!mBluetoothAdapter.isEnabled()){
@@ -250,28 +249,23 @@ public class CoreActivity extends AppCompatActivity {
             IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
             registerReceiver(mBroadcastReceiver1, BTIntent);
         }
+
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
 
-        assert manager != null;
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-            Toast.makeText(getApplicationContext(), "Please active your GPS",
+        if (manager == null || !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            Toast.makeText(getApplicationContext(), R.string.txt_enable_gps,
                     Toast.LENGTH_LONG).show();
         }
 
 
-            if(mBluetoothAdapter.isDiscovering()){
+        if(mBluetoothAdapter.isDiscovering()){
             mBluetoothAdapter.cancelDiscovery();
             Log.d(TAG, "btnDiscover: Canceling discovery.");
+        }
 
-            mBluetoothAdapter.startDiscovery();
-            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
-        }
-        else {
-            mBluetoothAdapter.startDiscovery();
-            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
-        }
+        mBluetoothAdapter.startDiscovery();
+        IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
     }
 
     private void retrievePairedDevices(){

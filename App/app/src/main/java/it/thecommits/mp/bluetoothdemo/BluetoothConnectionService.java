@@ -20,7 +20,7 @@ import java.util.UUID;
 class BluetoothConnectionService {
     private static final String TAG = "BluetoothConnectionServ";
 
-    private static final String appName = "MYAPP";
+    private static final String appName = "BluetoothDemo";
 
     private static final UUID MY_UUID_INSECURE =
             UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
@@ -191,7 +191,7 @@ class BluetoothConnectionService {
 
         //init progress dialog
         mProgressDialog = ProgressDialog.show(mContext,"Connecting Bluetooth"
-                ,"Please Wait...",true);
+                ,mContext.getString(R.string.txt_please_wait),true);
 
         mConnectThread = new ConnectThread(device, MY_UUID_INSECURE);
         mConnectThread.start();

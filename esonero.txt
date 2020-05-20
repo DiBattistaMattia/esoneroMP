@@ -1,0 +1,5 @@
+Nome del Gruppo: the commits
+Elenco di tutti i membri del gruppo:
+Mattia Di Battista, 0239836
+// (Nome, Cognome e matricola)
+Esonero selezionato: Bluetooth

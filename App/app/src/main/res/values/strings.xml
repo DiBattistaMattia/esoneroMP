@@ -1,29 +1,17 @@
 <resources>
     <string name="app_name">Bluetooth Demo</string>
     <string name="btn_transmitter">Continue</string>
-    <string name="btn_receiver">Receive</string>
-    <string name="btn_scan">Start/stop scan</string>
     <string name="btn_send">Send</string>
     <string name="et_hint_msg">Message…</string>
     <string name="hint_type_a_message">Type a message…</string>
-    <string name="btn_connect">Connect</string>
-    <string name="not_connected">No device connected</string>
-    <string name="none_found">No new devices found…</string>
     <string name="presentation_msg">Hi! this is a Bluetooth demo, the aim is to provide
 two types of functions, transmit a message from one device to a
 other and receive the same. Click on the button below to continue!</string>
 
-    <string name="app_name2">BT</string>
     <string name="hello">Bluetooth Demo</string>
-    <string name="select_device">Select Me!</string>
-    <string name="none_paired">No devices paired, see manual</string>
-    <string name="discover">Discover Devices</string>
-
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="on_off">ON/OFF</string>
-    <string name="btn_enable_discoverable">Enable Discoverable</string>
+    <string name="btn_enable_discoverable">Discoverable</string>
     <string name="btn_discover">Discover</string>
-    <string name="toast_incoming_message">New message incoming</string>
     <string name="sendPresentation">\Send something to \</string>
     <string name="devices_yet_paired">Devices yet paired</string>
     <string name="devices_not_yet_paired">Devices not yet paired</string>

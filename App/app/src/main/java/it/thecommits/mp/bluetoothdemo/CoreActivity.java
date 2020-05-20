@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -181,7 +182,7 @@ public class CoreActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_transmitter);
+        setContentView(R.layout.activity_core);
         holder = new Holder();
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         retrievePairedDevices();
@@ -205,6 +206,7 @@ public class CoreActivity extends AppCompatActivity {
         if(mBluetoothAdapter == null){
             Log.d(TAG, "enableDisableBT: Does not have BT capabilities.");
         }
+
         if(!mBluetoothAdapter.isEnabled()){
             Log.d(TAG, "enableDisableBT: enabling BT.");
             Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -240,8 +242,24 @@ public class CoreActivity extends AppCompatActivity {
 
         //check BT permissions in manifest
         checkBTPermissions();
+        if(!mBluetoothAdapter.isEnabled()){
+            Log.d(TAG, "enableDisableBT: enabling BT.");
+            Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivity(enableBTIntent);
 
-        if(mBluetoothAdapter.isDiscovering()){
+            IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+            registerReceiver(mBroadcastReceiver1, BTIntent);
+        }
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
+        assert manager != null;
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            Toast.makeText(getApplicationContext(), "Please active your GPS",
+                    Toast.LENGTH_LONG).show();
+        }
+
+
+            if(mBluetoothAdapter.isDiscovering()){
             mBluetoothAdapter.cancelDiscovery();
             Log.d(TAG, "btnDiscover: Canceling discovery.");
 

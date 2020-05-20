@@ -12,9 +12,9 @@
         android:id="@+id/tvPresentation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="44dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="@dimen/core_activity_right_left2_margin"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/core_activity_right_left2_margin"
         android:text="@string/presentation_msg"
         android:textAlignment="center"
         android:textColor="@android:color/background_light"
@@ -28,14 +28,16 @@
         android:id="@+id/btnContinue"
         android:layout_width="178dp"
         android:layout_height="42dp"
-        android:layout_marginStart="116dp"
-        android:layout_marginEnd="117dp"
-        android:layout_marginBottom="274dp"
+        android:layout_marginStart="@dimen/activity_right_left_margin"
+        android:layout_marginTop="@dimen/activity_right_left_margin"
+        android:layout_marginEnd="@dimen/activity_right_left_margin"
+        android:layout_marginBottom="@dimen/activity_right_left_margin"
         android:backgroundTint="@android:color/tertiary_text_light"
         android:text="@string/btn_transmitter"
         android:textColor="@android:color/background_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvPresentation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,1 @@
-Nome del Gruppo: the commits
-Elenco di tutti i membri del gruppo (2):
-Mattia Di Battista, 0239836
-Robert Adrian Minut, 0253186
-Esonero selezionato: Bluetooth
+the commits;geom.dibattistamattia@gmail.com;Bluetooth;Mattia Di Battista;Robert Adrian Minut

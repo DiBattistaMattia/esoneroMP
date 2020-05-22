@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -177,6 +178,8 @@ public class CoreActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_core);
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         holder = new Holder();
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         retrievePairedDevices();

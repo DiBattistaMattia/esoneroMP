@@ -1,1 +1,1 @@
-# esoneroMP
+# Bluetooth chat implementation
